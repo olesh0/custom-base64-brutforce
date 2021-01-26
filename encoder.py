@@ -27,7 +27,10 @@ def dataencode(x):
 
 
 def datadecode(x):
-  return x.translate(decodedset)
+  translated = x.translate(decodedset)
+  decoded = base64.b64decode(translated)
+
+  return decoded
 
 
 def randset():
@@ -53,10 +56,12 @@ if __name__ == "__main__":
   randset()
 
   # print "Type text to encode with random base64 table:"
-  plaintext = input("Put your string to encode into base64 with random table: ")
+  plaintext = "random string to encode with base64 custom table encoder/decoder" # input("Put your string to encode into base64 with random table: ")
 
   #  Encode the plaintext string
-  enc = dataencode(plaintext)
+  encoded = dataencode(plaintext).decode()
   #enc = 'WGtECM0UDeq9CGs3eHwGriEFqdYIrjgGvdw5qSEGrTkIrTU4vdrFqcEHpjkIqTC4'
+  decoded = datadecode(encoded).decode()
 
-  print (enc)
+  print ("encoded: ", encoded)
+  print("decoded: ", decoded)
