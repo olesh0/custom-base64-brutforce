@@ -1,4 +1,3 @@
-from file import read_data
 from os.path import exists
 
 cipher_file_content = None
@@ -27,7 +26,7 @@ def check_file_exists(answer):
 
   return False
 
-def ask_options(possible_options, label, validate = None):
+def ask_options(possible_options, label, validate = None, default = None):
   do_again = lambda : ask_options(
     possible_options=possible_options,
     label=label
@@ -37,6 +36,9 @@ def ask_options(possible_options, label, validate = None):
 
   if validate and not validate(answer):
     return do_again()
+
+  if not answer and default:
+    return default
 
   if not answer or answer not in possible_options:
     return do_again()
@@ -54,6 +56,13 @@ if __name__ == "__main__":
     validate=check_file_exists
   )
 
+  stop_when_word_matched = ask_options(
+    possible_options=["Y", "n"],
+    label="Wanna stop as soon as one word matched? [Y/n]: ",
+    default="y"
+  )
+
+  print("FYI:", "stop then single word matched" if stop_when_word_matched == "y" else "never stop")
   print(words_to_expect)
 
   if way_to_go == "f":
