@@ -19,7 +19,13 @@ decodedset = str.maketrans(cuscharset, b64charset)
 
 def set_charset(new_charset):
   global cuscharset
+  global encodedset
+  global decodedset
+
   cuscharset = new_charset
+
+  encodedset = str.maketrans(b64charset, cuscharset)
+  decodedset = str.maketrans(cuscharset, b64charset)
 
 
 def dataencode(x):
