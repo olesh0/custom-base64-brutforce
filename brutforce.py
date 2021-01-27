@@ -63,16 +63,14 @@ def write_match(result, key):
 
 
 if __name__ == "__main__":
-  # words_to_expect_raw = input("Words to expect (divided by |): ")
-  # words_to_expect = words_to_expect_raw.split('|')
+  words_to_expect_raw = input("Words to expect (divided by |): ")
+  words_to_expect = words_to_expect_raw.split('|')
 
-  # way_to_go = ask_options(
-  #   possible_options=["f", "s"],
-  #   label="Wanna do a file or just paste a string? [f/s] ",
-  #   validate=check_file_exists
-  # )
-
-  string_to_brutforce = "rq165PJcRXLSgROa1Cb+"
+  way_to_go = ask_options(
+    possible_options=["f", "s"],
+    label="Wanna do a file or just paste a string? [f/s] ",
+    validate=check_file_exists
+  )
 
   stop_when_word_matched = ask_options(
     possible_options=["Y", "n"],
@@ -81,9 +79,10 @@ if __name__ == "__main__":
   )
 
   print("FYI:", "stop then single word matched" if stop_when_word_matched == "y" else "never stop")
+  print(words_to_expect)
 
-  # if way_to_go == "f":
-  #   string_to_brutforce = cipher_file_content
+  if way_to_go == "f":
+    string_to_brutforce = cipher_file_content
 
   print("#### starting brutforce process ####")
 
@@ -96,7 +95,7 @@ if __name__ == "__main__":
 
   print(f"Key length is {len(key)}")
 
-  with Bar('Processing %(percent).3f%%', max=possible_options_count, suffix='%(percent)d%%') as bar:
+  with Bar('%(elapsed)ds Processing %(percent).5f%%', max=possible_options_count, suffix='%(percent)d%%') as bar:
     # Moving each character along the string, so there's each posibility included
     while matched_word == None and iteration < possible_options_count:
       guess = random.choices(list(key), k=len(key))
@@ -105,7 +104,16 @@ if __name__ == "__main__":
       custombase64.set_charset(processing_key)
       decoded = custombase64.datadecode(string_to_brutforce)
 
-      write_match(result=decoded, key=processing_key)
+      decoded_text = str(decoded).lower()
+
+      for word in words_to_expect:
+        if len(word) > 0 and word in decoded_text:
+          print(f"\nword matched: {word} => {decoded_text}\n")
+          write_match(result=decoded_text, key=processing_key)
+
+          if stop_when_word_matched:
+            matched_word = True
+
       iteration += 1
       bar.suffix = f"Processing key {processing_key}"
       bar.next()
