@@ -2,6 +2,7 @@ import math
 import random
 import custombase64
 import string
+from numerize import numerize
 from os.path import exists
 from progress.bar import Bar
 
@@ -115,5 +116,5 @@ if __name__ == "__main__":
             matched_word = True
 
       iteration += 1
-      bar.suffix = f"Processing key {processing_key}"
+      bar.suffix = f"[{numerize.numerize(iteration, 2)}] Processing key {processing_key}"
       bar.next()
