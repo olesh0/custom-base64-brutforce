@@ -52,7 +52,7 @@ def main():
   print(decoded)
   print("=============================")
 
-  print(f"Decoded. The result is written into {decrypted_file_path}")
+  print(f"Decoded. The result is written into ==>> {decrypted_file_path}")
 
 
 if __name__ == '__main__':
