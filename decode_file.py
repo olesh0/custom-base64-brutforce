@@ -33,9 +33,11 @@ def ask_file_path():
   return file_path
 
 
-def main():
-  file_path = ask_file_path()
-  key = ask_key()
+def decode_file(file_path, key):
+  if not path.exists(file_path):
+    print("File does not exist.")
+
+    return None
 
   file = open(file_path, "r")
   data = file.read()
@@ -48,11 +50,26 @@ def main():
   decrypted_file = open(decrypted_file_path, "w+")
   decrypted_file.write(decoded)
 
+  return {
+    'decoded': decoded,
+    'path': decrypted_file_path,
+  }
+
+
+def main():
+  file_path = ask_file_path()
+  key = ask_key()
+
+  decryption = decode_file(file_path, key)
+
+  if not decryption:
+    return
+
   print("=============================")
-  print(decoded)
+  print(decryption.get('decoded'))
   print("=============================")
 
-  print(f"Decoded. The result is written into ==>> {decrypted_file_path}")
+  print(f"Decoded. The result is written into ==>> {decryption.get('path')}")
 
 
 if __name__ == '__main__':

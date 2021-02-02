@@ -22,8 +22,11 @@ def ask_file_path():
   return file_path
 
 
-def main():
-  file_path = "cypher_files/secret_song" # ask_file_path()
+def encode_file(file_path):
+  if not path.exists(file_path):
+    print("File does not exist.")
+
+    return None
 
   file = open(file_path, "r")
   data = file.read()
@@ -33,7 +36,6 @@ def main():
 
   encoded = custombase64.dataencode(data)
   encoded_prettified = ""
-
 
   for index, letter in enumerate(encoded):
     if index % 80 == 0 and index > 0:
@@ -47,11 +49,24 @@ def main():
   encrypted_file = open(encrypted_file_path, "w+")
   encrypted_file.write(encoded_prettified)
 
+  return {
+    'path': encrypted_file_path,
+  }
+
+
+def main():
+  file_path = ask_file_path()
+
+  file_encryption = encode_file(file_path)
+
+  if not file_encryption:
+    return
+
   print("=============================")
   print(f"Here's your key: {custombase64.cuscharset}")
   print("=============================")
 
-  print(f"Encoded. The result is written into ==>> {encrypted_file_path}")
+  print(f"Encoded. The result is written into ==>> {file_encryption.get('path')}")
 
 
 if __name__ == '__main__':
