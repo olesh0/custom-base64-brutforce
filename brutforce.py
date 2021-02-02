@@ -28,7 +28,7 @@ def main():
     default="y"
   )
 
-  print("FYI:", "stop then single word matched" if stop_when_word_matched == "y" else "never stop")
+  print("FYI:", "stop when single word matched" if stop_when_word_matched == "y" else "never stop")
   print(words_to_expect)
 
   if way_to_go == "f":
