@@ -2,6 +2,7 @@
 
 import base64
 import random
+from brutforce import ask_options
 
 show_key = False
 text_to_cypher = "random string to encode with base64 custom table encoder/decoder"
@@ -17,9 +18,53 @@ encodedset = str.maketrans(b64charset, cuscharset)
 decodedset = str.maketrans(cuscharset, b64charset)
 
 
+def main():
+  action = ask_options(possible_options=['e', 'd'], label='Encode or decode? [e/d]: ')
+
+  print ("================================")
+
+  if action == 'e':
+    encode_process()
+  elif action == 'd':
+    decode_process()
+
+
+def encode_process():
+  global show_key
+
+  plaintext = input("What shall we cypher [empty for random string]? ")
+  show_key = input("Shall we show you the key [y/N]? ").lower() == "y"
+
+  phrase = randset(plaintext)
+  encoded = dataencode(text_to_cypher)
+
+  print("========================")
+
+  if show_key:
+    print(f"Key: {cuscharset}")
+
+  print ("Cypher text:", encoded)
+
+
+def decode_process():
+  decode_string = input("What shall we decypher? ")
+  key = input("What's your key? ")
+
+  set_charset(key)
+  decoded = datadecode(decode_string).decode()
+
+  print (f"========== {decoded} ===========")
+
+
 def set_charset(new_charset):
   global cuscharset
+  global encodedset
+  global decodedset
+
   cuscharset = new_charset
+
+  encodedset = str.maketrans(b64charset, cuscharset)
+  decodedset = str.maketrans(cuscharset, b64charset)
 
 
 def dataencode(x):
@@ -43,7 +88,7 @@ def randset(text):
 
   options_to_cypher = [
     "Every prison has a way to escape.",
-    "Get busy live, or get busy die.",
+    "Get busy living, or get busy dying.",
     "Hope is a good thing. May be the best of things.",
     "That's all it takes. Pressure... and time."
   ]
@@ -67,15 +112,4 @@ def randset(text):
 
 
 if __name__ == "__main__":
-  plaintext = input("What shall we cypher [empty for random string]? ")
-  show_key = input("Shall we show you the key [y/N]? ").lower() == "y"
-
-  phrase = randset(plaintext)
-
-  if show_key:
-    print(f"Here's the key: {phrase} => {cuscharset}")
-
-  #  Encode the plaintext string
-  encoded = dataencode(text_to_cypher)
-
-  print ("encoded (cypher text):", encoded)
+  main()
