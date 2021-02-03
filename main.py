@@ -4,7 +4,7 @@ import json
 from simple_term_menu import TerminalMenu
 from menu import initial_actions, handlers
 
-default_files_directory = "cypher_files/"
+default_files_directory = "cipher_files/"
 
 
 def retrieve_labels(actions):

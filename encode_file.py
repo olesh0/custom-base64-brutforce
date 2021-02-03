@@ -35,7 +35,7 @@ def encode_file(file_path):
     encoded_prettified += letter
 
 
-  encrypted_file_path = f"{file_path}.cypher"
+  encrypted_file_path = f"{file_path}.cipher"
 
   encrypted_file = open(encrypted_file_path, "w+")
   encrypted_file.write(encoded_prettified)
