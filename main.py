@@ -88,16 +88,17 @@ def main():
 
   handler = data.get("handler", None)
 
-  print(handler)
-
   if handler:
     files_data = data.get("files", [])
     input_data = data.get("data", [])
 
     # Running assigned handler
     handlers[handler](files_data | input_data)
+  else:
+    print("No handler found for", data.get('label'))
 
-  print(json.dumps(data, indent = 2))
+  print("================ DEBUG INFO =================")
+  print(print(json.dumps(data, indent = 2)))
 
 
 if __name__ == "__main__":

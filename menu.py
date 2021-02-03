@@ -1,10 +1,31 @@
-def encode_file(data):
-  print("ENCODING FILE...", data)
+from encode_file import encode_file
+from decode_file import decode_file
+from custombase64 import encode_process
 
-  return True
+def encode_file_handler(data):
+  file_path = data.get('encode_file', None)
+
+  print(f"Encrypting file ==>> {file_path}")
+
+  encrypted = encode_file(file_path)
+
+  print(f"Created file at: {encrypted.get('path', 'Unknown path')}")
+  print(f"Encrypted with this key: {encrypted.get('key', 'UNKNOWN KEY')}")
+
+  return encrypted
+
+def encode_string(data):
+  encode_string = data.get('encode_string', None)
+
+  print(f"Encrypting string ==>> {encode_string}")
+
+  encrypted = encode_process(encode_string=encode_string)
+
+  return encrypted
 
 handlers = {
-  "encode_file": encode_file,
+  "encode_file": encode_file_handler,
+  "encode_string": encode_string,
 }
 
 initial_actions = {
@@ -22,6 +43,7 @@ initial_actions = {
         },
         {
           'label': "Encode string",
+          'handler': "encode_string",
           'data': [
             { 'reason': "String to encode: ", 'name': 'encode_string' }
           ],

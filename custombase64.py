@@ -29,11 +29,11 @@ def main():
     decode_process()
 
 
-def encode_process():
+def encode_process(encode_string = None):
   global show_key
 
-  plaintext = input("What shall we cypher [empty for random string]? ")
-  show_key = input("Shall we show you the key [y/N]? ").lower() == "y"
+  plaintext = encode_string or input("What shall we cypher [empty for random string]? ")
+  show_key = bool(encode_string) or input("Shall we show you the key [y/N]? ").lower() == "y"
 
   phrase = randset(plaintext)
   encoded = dataencode(text_to_cypher)

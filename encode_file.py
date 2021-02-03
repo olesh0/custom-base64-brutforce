@@ -3,15 +3,6 @@ from brutforce import ask_options
 from os import path
 
 
-def ask_key():
-  key = input("What's your key? ")
-
-  if not key:
-    return ask_key()
-
-  return key
-
-
 def ask_file_path():
   file_path = input("File path: ")
   file_exists = path.exists(file_path)
@@ -51,6 +42,7 @@ def encode_file(file_path):
 
   return {
     'path': encrypted_file_path,
+    'key': custombase64.cuscharset,
   }
 
 
