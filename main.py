@@ -3,6 +3,7 @@ import json
 
 from simple_term_menu import TerminalMenu
 from menu import initial_actions, handlers
+from console.utils import wait_key
 
 default_files_directory = "cipher_files/"
 
@@ -97,8 +98,10 @@ def main():
   else:
     print("No handler found for", data.get('label'))
 
-  print("================ DEBUG INFO =================")
-  print(print(json.dumps(data, indent = 2)))
+  print("Press any key to contiue...")
+  wait_key()
+
+  main()
 
 
 if __name__ == "__main__":

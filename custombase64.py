@@ -46,9 +46,9 @@ def encode_process(encode_string = None):
   print ("cipher text:", encoded)
 
 
-def decode_process():
-  decode_string = input("What shall we decipher? ")
-  key = input("What's your key? ")
+def decode_process(cipher_text = None, decode_key = None):
+  decode_string = cipher_text or input("What shall we decipher? ")
+  key = decode_key or input("What's your key? ")
 
   set_charset(key)
   decoded = datadecode(decode_string).decode()
