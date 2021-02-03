@@ -11,10 +11,9 @@ results_file = None
 
 
 def main():
-  import custombase64
+  global string_to_brutforce
 
   words_to_expect_raw = input("Words to expect (divided by |): ")
-  words_to_expect = words_to_expect_raw.split('|')
 
   way_to_go = ask_options(
     possible_options=["f", "s"],
@@ -22,22 +21,32 @@ def main():
     validate=check_file_exists
   )
 
-  stop_when_word_matched = ask_options(
-    possible_options=["Y", "n"],
-    label="Wanna stop as soon as one word matched? [Y/n]: ",
-    default="y"
-  )
-
-  print("FYI:", "stop then single word matched" if stop_when_word_matched == "y" else "never stop")
-  print(words_to_expect)
-
   if way_to_go == "f":
     string_to_brutforce = cipher_file_content
+
+  apply_brutforce(words_to_expect=words_to_expect_raw)
+
+
+def apply_brutforce(words_to_expect = None):
+  import custombase64
+  global string_to_brutforce
+
+  if not words_to_expect:
+    print("No words to expect were set...")
+    return None
+
+  if not string_to_brutforce:
+    print("No string to brutforce was set...")
+    return None
+
+  words_to_expect = words_to_expect.split('|')
 
   print("#### starting brutforce process ####")
 
   matched_word = None
   iteration = 1
+
+  print("Expecting these words: ", words_to_expect)
 
   key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
@@ -45,7 +54,7 @@ def main():
 
   print(f"Key length is {len(key)}")
 
-  with Bar('%(elapsed)ds Processing %(percent).5f%%', max=possible_options_count, suffix='%(percent)d%%') as bar:
+  with Bar('%(elapsed)ds Processing %(percent).12f%%', max=possible_options_count, suffix='%(percent)d%%') as bar:
     while matched_word == None and iteration < possible_options_count:
       """
       TODO Never use random.choices for such operations
@@ -64,12 +73,17 @@ def main():
           print(f"\nword matched: {word} => {decoded_text}\n")
           write_match(result=decoded_text, key=processing_key)
 
-          if stop_when_word_matched:
-            matched_word = True
-
       iteration += 1
       bar.suffix = f"[{numerize.numerize(iteration, 2)}] Processing key {processing_key}"
       bar.next()
+
+
+def set_cipher_file(file_path):
+  global cipher_file_content
+  global string_to_brutforce
+
+  cipher_file_content = open(file_path, mode='r').read()
+  string_to_brutforce = cipher_file_content
 
 
 def check_file_exists(answer):
@@ -83,8 +97,7 @@ def check_file_exists(answer):
       print("Such file doesn't exist...")
       return False
 
-    global cipher_file_content
-    cipher_file_content = open(file_path, mode='r').read()
+    set_cipher_file(file_path)
 
     return True
   elif answer == "s":

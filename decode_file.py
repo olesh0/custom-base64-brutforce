@@ -2,7 +2,7 @@ import custombase64
 from brutforce import ask_options
 from os import path
 
-default_file_path = "cypher_files/default.cypher"
+default_file_path = "cipher_files/default.cipher"
 
 
 def ask_key():
