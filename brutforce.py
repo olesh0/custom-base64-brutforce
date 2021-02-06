@@ -1,6 +1,6 @@
 import math
-import random
 import string
+import itertools
 from numerize import numerize
 from os.path import exists
 from progress.bar import Bar
@@ -13,18 +13,24 @@ results_file = None
 def main():
   global string_to_brutforce
 
-  words_to_expect_raw = input("Words to expect (divided by |): ")
+  words_to_expect_raw = "kek|lol" # input("Words to expect (divided by |): ")
 
-  way_to_go = ask_options(
-    possible_options=["f", "s"],
-    label="Wanna do a file or just paste a string? [f/s] ",
-    validate=check_file_exists
-  )
+  # way_to_go = ask_options(
+  #   possible_options=["f", "s"],
+  #   label="Wanna do a file or just paste a string? [f/s] ",
+  #   validate=check_file_exists
+  # )
 
-  if way_to_go == "f":
-    string_to_brutforce = cipher_file_content
+  # if way_to_go == "f":
+  #   string_to_brutforce = cipher_file_content
+
+  string_to_brutforce = "P81pkQl5"
 
   apply_brutforce(words_to_expect=words_to_expect_raw)
+
+
+def string_into_list(string):
+  return [char for char in string]
 
 
 def apply_brutforce(words_to_expect = None):
@@ -44,7 +50,7 @@ def apply_brutforce(words_to_expect = None):
   print("#### starting brutforce process ####")
 
   matched_word = None
-  iteration = 1
+  iteration = 0
 
   print("Expecting these words: ", words_to_expect)
 
@@ -54,14 +60,19 @@ def apply_brutforce(words_to_expect = None):
 
   print(f"Key length is {len(key)}")
 
+  print(len(list(itertools.permutations(string_into_list(key), len(key)))))
+
+  return
+
   with Bar('%(elapsed)ds Processing %(percent).12f%%', max=possible_options_count, suffix='%(percent)d%%') as bar:
-    while matched_word == None and iteration < possible_options_count:
-      """
-      TODO Never use random.choices for such operations
-      There's a big chance some options are being checked a few times (a few million times)
-      """
-      guess = random.choices(list(key), k=len(key))
-      processing_key = "".join(guess)
+    for processing_key_list in itertools.combinations(key, r=len(key)):
+      print(iteration)
+
+      if matched_word != None or iteration >= possible_options_count:
+        print("I'm done here...")
+        break
+
+      processing_key = "".join(processing_key_list)
 
       custombase64.set_charset(processing_key)
       decoded = custombase64.datadecode(string_to_brutforce)
@@ -107,6 +118,35 @@ def check_file_exists(answer):
     return len(string_to_brutforce) > 0
 
   return False
+
+
+# TODO Make number based (it doesn't try to generate all possible options at once...)
+def index_based_permutations(iterable, r=None):
+  # permutations('ABCD', 2) --> AB AC AD BA BC BD CA CB CD DA DB DC
+  # permutations(range(3)) --> 012 021 102 120 201 210
+  pool = tuple(iterable)
+  n = len(pool)
+  r = n if r is None else r
+
+  if r > n:
+    return
+
+  indices = list(range(n))
+  cycles = list(range(n, n-r, -1))
+  yield tuple(pool[i] for i in indices[:r])
+  while n:
+    for i in reversed(range(r)):
+      cycles[i] -= 1
+      if cycles[i] == 0:
+        indices[i:] = indices[i+1:] + indices[i:i+1]
+        cycles[i] = n - i
+      else:
+        j = cycles[i]
+        indices[i], indices[-j] = indices[-j], indices[i]
+        yield tuple(pool[i] for i in indices[:r])
+        break
+    else:
+      return
 
 
 def ask_options(possible_options, label, validate = None, default = None):
