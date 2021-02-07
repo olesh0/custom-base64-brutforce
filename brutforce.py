@@ -60,14 +60,12 @@ def apply_brutforce(words_to_expect = None):
 
   print(f"Key length is {len(key)}")
 
-  print(len(list(itertools.permutations(string_into_list(key), len(key)))))
-
-  return
-
   with Bar('%(elapsed)ds Processing %(percent).12f%%', max=possible_options_count, suffix='%(percent)d%%') as bar:
-    for processing_key_list in itertools.combinations(key, r=len(key)):
-      print(iteration)
-
+    """
+    NOTE Well, it turns out, that it doesn't generate all options at once,
+    but how I need to pass an iteration variable somehow, so we can say start at this point
+    """
+    for processing_key_list in itertools.permutations(key):
       if matched_word != None or iteration >= possible_options_count:
         print("I'm done here...")
         break
@@ -87,7 +85,8 @@ def apply_brutforce(words_to_expect = None):
       iteration += 1
       bar.suffix = f"[{numerize.numerize(iteration, 2)}] Processing key {processing_key}"
       bar.next()
-
+    else:
+      print("So it looks like, we couldn't find out the key...")
 
 def set_cipher_file(file_path):
   global cipher_file_content
@@ -118,35 +117,6 @@ def check_file_exists(answer):
     return len(string_to_brutforce) > 0
 
   return False
-
-
-# TODO Make number based (it doesn't try to generate all possible options at once...)
-def index_based_permutations(iterable, r=None):
-  # permutations('ABCD', 2) --> AB AC AD BA BC BD CA CB CD DA DB DC
-  # permutations(range(3)) --> 012 021 102 120 201 210
-  pool = tuple(iterable)
-  n = len(pool)
-  r = n if r is None else r
-
-  if r > n:
-    return
-
-  indices = list(range(n))
-  cycles = list(range(n, n-r, -1))
-  yield tuple(pool[i] for i in indices[:r])
-  while n:
-    for i in reversed(range(r)):
-      cycles[i] -= 1
-      if cycles[i] == 0:
-        indices[i:] = indices[i+1:] + indices[i:i+1]
-        cycles[i] = n - i
-      else:
-        j = cycles[i]
-        indices[i], indices[-j] = indices[-j], indices[i]
-        yield tuple(pool[i] for i in indices[:r])
-        break
-    else:
-      return
 
 
 def ask_options(possible_options, label, validate = None, default = None):
