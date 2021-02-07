@@ -70,21 +70,25 @@ def apply_brutforce(words_to_expect = None):
         print("I'm done here...")
         break
 
-      processing_key = "".join(processing_key_list)
+      try:
+        processing_key = "".join(processing_key_list)
 
-      custombase64.set_charset(processing_key)
-      decoded = custombase64.datadecode(string_to_brutforce)
+        custombase64.set_charset(processing_key)
+        decoded = custombase64.datadecode(string_to_brutforce)
 
-      decoded_text = str(decoded).lower()
+        decoded_text = str(decoded).lower()
 
-      for word in words_to_expect:
-        if len(word) > 0 and word in decoded_text:
-          print(f"\nword matched: {word} => {decoded_text}\n")
-          write_match(result=decoded_text, key=processing_key)
+        for word in words_to_expect:
+          if len(word) > 0 and word in decoded_text:
+            print(f"\nword matched: {word} => {decoded_text}\n")
+            write_match(result=decoded_text, key=processing_key)
 
-      iteration += 1
-      bar.suffix = f"[{numerize.numerize(iteration, 2)}] Processing key {processing_key}"
-      bar.next()
+        iteration += 1
+        bar.suffix = f"[{numerize.numerize(iteration, 2)}] Processing key {processing_key}"
+        bar.next()
+      except Exception, error:
+        print("Something has failed...", error)
+        continue
     else:
       print("So it looks like, we couldn't find out the key...")
 
