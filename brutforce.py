@@ -1,6 +1,6 @@
 import math
-import random
 import string
+import itertools
 from numerize import numerize
 from os.path import exists
 from progress.bar import Bar
@@ -13,18 +13,24 @@ results_file = None
 def main():
   global string_to_brutforce
 
-  words_to_expect_raw = input("Words to expect (divided by |): ")
+  words_to_expect_raw = "kek|lol" # input("Words to expect (divided by |): ")
 
-  way_to_go = ask_options(
-    possible_options=["f", "s"],
-    label="Wanna do a file or just paste a string? [f/s] ",
-    validate=check_file_exists
-  )
+  # way_to_go = ask_options(
+  #   possible_options=["f", "s"],
+  #   label="Wanna do a file or just paste a string? [f/s] ",
+  #   validate=check_file_exists
+  # )
 
-  if way_to_go == "f":
-    string_to_brutforce = cipher_file_content
+  # if way_to_go == "f":
+  #   string_to_brutforce = cipher_file_content
+
+  string_to_brutforce = "P81pkQl5"
 
   apply_brutforce(words_to_expect=words_to_expect_raw)
+
+
+def string_into_list(string):
+  return [char for char in string]
 
 
 def apply_brutforce(words_to_expect = None):
@@ -44,7 +50,7 @@ def apply_brutforce(words_to_expect = None):
   print("#### starting brutforce process ####")
 
   matched_word = None
-  iteration = 1
+  iteration = 0
 
   print("Expecting these words: ", words_to_expect)
 
@@ -55,13 +61,16 @@ def apply_brutforce(words_to_expect = None):
   print(f"Key length is {len(key)}")
 
   with Bar('%(elapsed)ds Processing %(percent).12f%%', max=possible_options_count, suffix='%(percent)d%%') as bar:
-    while matched_word == None and iteration < possible_options_count:
-      """
-      TODO Never use random.choices for such operations
-      There's a big chance some options are being checked a few times (a few million times)
-      """
-      guess = random.choices(list(key), k=len(key))
-      processing_key = "".join(guess)
+    """
+    NOTE Well, it turns out, that it doesn't generate all options at once,
+    but how I need to pass an iteration variable somehow, so we can say start at this point
+    """
+    for processing_key_list in itertools.permutations(key):
+      if matched_word != None or iteration >= possible_options_count:
+        print("I'm done here...")
+        break
+
+      processing_key = "".join(processing_key_list)
 
       custombase64.set_charset(processing_key)
       decoded = custombase64.datadecode(string_to_brutforce)
@@ -76,7 +85,8 @@ def apply_brutforce(words_to_expect = None):
       iteration += 1
       bar.suffix = f"[{numerize.numerize(iteration, 2)}] Processing key {processing_key}"
       bar.next()
-
+    else:
+      print("So it looks like, we couldn't find out the key...")
 
 def set_cipher_file(file_path):
   global cipher_file_content
