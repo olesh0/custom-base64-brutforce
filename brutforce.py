@@ -13,27 +13,27 @@ results_file = None
 def main():
   global string_to_brutforce
 
-  words_to_expect_raw = "kek|lol" # input("Words to expect (divided by |): ")
+  words_to_expect_raw = input("Words to expect (divided by |): ")
 
-  # way_to_go = ask_options(
-  #   possible_options=["f", "s"],
-  #   label="Wanna do a file or just paste a string? [f/s] ",
-  #   validate=check_file_exists
-  # )
+  way_to_go = ask_options(
+    possible_options=["f", "s"],
+    label="Wanna do a file or just paste a string? [f/s] ",
+    validate=check_file_exists
+  )
 
-  # if way_to_go == "f":
-  #   string_to_brutforce = cipher_file_content
+  if way_to_go == "f":
+    string_to_brutforce = cipher_file_content
 
-  string_to_brutforce = "P81pkQl5"
+  start = input("Iteration to start with [0]: ") or 0
 
-  apply_brutforce(words_to_expect=words_to_expect_raw)
+  apply_brutforce(words_to_expect=words_to_expect_raw, start=int(start))
 
 
 def string_into_list(string):
   return [char for char in string]
 
 
-def apply_brutforce(words_to_expect = None):
+def apply_brutforce(words_to_expect = None, start = None):
   import custombase64
   global string_to_brutforce
 
@@ -65,7 +65,7 @@ def apply_brutforce(words_to_expect = None):
     NOTE Well, it turns out, that it doesn't generate all options at once,
     but how I need to pass an iteration variable somehow, so we can say start at this point
     """
-    for processing_key_list in itertools.permutations(key):
+    for processing_key_list in itertools.islice(itertools.permutations(key), start, None):
       if matched_word != None or iteration >= possible_options_count:
         print("I'm done here...")
         break
@@ -86,11 +86,16 @@ def apply_brutforce(words_to_expect = None):
         iteration += 1
         bar.suffix = f"[{numerize.numerize(iteration, 2)}] Processing key {processing_key}"
         bar.next()
-      except Exception, error:
-        print("Something has failed...", error)
+      except KeyboardInterrupt:
+        print("\n\nStopping...\n\n")
+        exit()
+      except:
+        print(f"Something has failed... iteration={iteration}")
+        iteration += 1
         continue
     else:
       print("So it looks like, we couldn't find out the key...")
+
 
 def set_cipher_file(file_path):
   global cipher_file_content
