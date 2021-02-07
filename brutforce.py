@@ -1,6 +1,6 @@
 import math
-import random
 import string
+import itertools
 from numerize import numerize
 from os.path import exists
 from progress.bar import Bar
@@ -24,10 +24,16 @@ def main():
   if way_to_go == "f":
     string_to_brutforce = cipher_file_content
 
-  apply_brutforce(words_to_expect=words_to_expect_raw)
+  start = input("Iteration to start with [0]: ") or 0
+
+  apply_brutforce(words_to_expect=words_to_expect_raw, start=int(start))
 
 
-def apply_brutforce(words_to_expect = None):
+def string_into_list(string):
+  return [char for char in string]
+
+
+def apply_brutforce(words_to_expect = None, start = None):
   import custombase64
   global string_to_brutforce
 
@@ -44,7 +50,7 @@ def apply_brutforce(words_to_expect = None):
   print("#### starting brutforce process ####")
 
   matched_word = None
-  iteration = 1
+  iteration = 0
 
   print("Expecting these words: ", words_to_expect)
 
@@ -55,27 +61,40 @@ def apply_brutforce(words_to_expect = None):
   print(f"Key length is {len(key)}")
 
   with Bar('%(elapsed)ds Processing %(percent).12f%%', max=possible_options_count, suffix='%(percent)d%%') as bar:
-    while matched_word == None and iteration < possible_options_count:
-      """
-      TODO Never use random.choices for such operations
-      There's a big chance some options are being checked a few times (a few million times)
-      """
-      guess = random.choices(list(key), k=len(key))
-      processing_key = "".join(guess)
+    """
+    NOTE Well, it turns out, that it doesn't generate all options at once,
+    but how I need to pass an iteration variable somehow, so we can say start at this point
+    """
+    for processing_key_list in itertools.islice(itertools.permutations(key), start, None):
+      if matched_word != None or iteration >= possible_options_count:
+        print("I'm done here...")
+        break
 
-      custombase64.set_charset(processing_key)
-      decoded = custombase64.datadecode(string_to_brutforce)
+      try:
+        processing_key = "".join(processing_key_list)
 
-      decoded_text = str(decoded).lower()
+        custombase64.set_charset(processing_key)
+        decoded = custombase64.datadecode(string_to_brutforce)
 
-      for word in words_to_expect:
-        if len(word) > 0 and word in decoded_text:
-          print(f"\nword matched: {word} => {decoded_text}\n")
-          write_match(result=decoded_text, key=processing_key)
+        decoded_text = str(decoded).lower()
 
-      iteration += 1
-      bar.suffix = f"[{numerize.numerize(iteration, 2)}] Processing key {processing_key}"
-      bar.next()
+        for word in words_to_expect:
+          if len(word) > 0 and word in decoded_text:
+            print(f"\nword matched: {word} => {decoded_text}\n")
+            write_match(result=decoded_text, key=processing_key)
+
+        iteration += 1
+        bar.suffix = f"[{numerize.numerize(iteration, 2)}] Processing key {processing_key}"
+        bar.next()
+      except KeyboardInterrupt:
+        print("\n\nStopping...\n\n")
+        exit()
+      except:
+        print(f"Something has failed... iteration={iteration}")
+        iteration += 1
+        continue
+    else:
+      print("So it looks like, we couldn't find out the key...")
 
 
 def set_cipher_file(file_path):
