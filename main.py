@@ -90,11 +90,11 @@ def main():
   handler = data.get("handler", None)
 
   if handler:
-    files_data = data.get("files", [])
-    input_data = data.get("data", [])
+    files_data = data.get("files", {})
+    input_data = data.get("data", {})
 
     # Running assigned handler
-    handlers[handler](files_data | input_data)
+    handlers[handler]({ **files_data, **input_data })
   else:
     print("No handler found for", data.get('label'))
 

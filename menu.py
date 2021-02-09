@@ -1,7 +1,7 @@
+import brutforce
 from encode_file import encode_file
 from decode_file import decode_file
 from custombase64 import encode_process, decode_process
-from brutforce import set_cipher_file, apply_brutforce
 
 def encode_file_handler(data):
   file_path = data.get('encode_file', None)
@@ -51,9 +51,35 @@ def decode_string_handler(data):
 def brutforce_file_handler(data):
   file_path = data.get('brutforce_file', None)
   words_to_expect = data.get('words_to_expect', None)
+  iteration_start = handle_integer_input(data.get('iteration_start', 0), default=0)
 
-  set_cipher_file(file_path)
-  apply_brutforce(words_to_expect=words_to_expect)
+  brutforce.set_cipher_file(file_path)
+  brutforce.apply_brutforce(words_to_expect=words_to_expect, start=iteration_start)
+
+
+def string_brutforce_handler(data):
+  brutforce_string = data.get('brutforce_string', None)
+
+  if not brutforce_string:
+    print("You must specify a string to brutforce.")
+    return
+
+  words_to_expect = data.get('words_to_expect', None)
+  iteration_start = handle_integer_input(data.get('iteration_start', 0), default=0)
+
+  brutforce.string_to_brutforce = brutforce_string
+  brutforce.apply_brutforce(words_to_expect=words_to_expect, start=iteration_start)
+
+
+def handle_integer_input(raw_input, default = None, log = True):
+  if len(raw_input) > 0:
+    try:
+      return int(raw_input)
+    except:
+      if log: print(f"Unknown value has been passed. Using default ({default})")
+      return default
+  else:
+    return default
 
 
 handlers = {
@@ -62,6 +88,7 @@ handlers = {
   "decode_file": decode_file_handler,
   "decode_string": decode_string_handler,
   "brutforce_file": brutforce_file_handler,
+  "string_brutforce_handler": string_brutforce_handler,
 }
 
 initial_actions = {
@@ -119,13 +146,17 @@ initial_actions = {
             { 'reason': 'Select file to encode', 'name': 'brutforce_file' }
           ],
           'data': [
-            { 'reason': 'Words to expect in decrypted text [divided by | ]:', 'name': 'words_to_expect' }
+            { 'reason': 'Words to expect in decrypted text [divided by | ]:', 'name': 'words_to_expect' },
+            { 'reason': 'Iteration start [0]: ', 'name': 'iteration_start' },
           ],
         },
         {
           'label': "Brutforce a string",
+          'handler': "string_brutforce_handler",
           'data': [
-            { 'reason': "String to brutforce: ", 'name': 'brutforce_string' }
+            { 'reason': 'Words to expect in decrypted text [divided by | ]:', 'name': 'words_to_expect' },
+            { 'reason': "String to brutforce: ", 'name': 'brutforce_string' },
+            { 'reason': 'Iteration start [0]: ', 'name': 'iteration_start' },
           ],
         },
       ],
