@@ -61,10 +61,8 @@ def apply_brutforce(words_to_expect = None, start = None):
   print(f"Key length is {len(key)}")
 
   with Bar('%(elapsed)ds Processing %(percent).12f%%', max=possible_options_count, suffix='%(percent)d%%') as bar:
-    """
-    NOTE Well, it turns out, that it doesn't generate all options at once,
-    but how I need to pass an iteration variable somehow, so we can say start at this point
-    """
+    iteration = start
+
     for processing_key_list in itertools.islice(itertools.permutations(key), start, None):
       if matched_word != None or iteration >= possible_options_count:
         print("I'm done here...")
